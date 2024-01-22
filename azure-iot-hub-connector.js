@@ -1,7 +1,6 @@
-const Crypto = require("crypto")
+const Crypto= require("crypto");
 const Buffer = require("buffer").Buffer;
-const {Connection, ReceiverEvents, AmqpError, parseConnectionString} = require("rhea-promise");
-const crypto = require("crypto");
+const {Connection, ReceiverEvents, isAmqpError, parseConnectionString} = require("rhea-promise");
 
 function generateSasToken(resourceUri, signingKey, policyName, expiresInMins) {
     resourceUri = encodeURIComponent(resourceUri);
@@ -9,7 +8,7 @@ function generateSasToken(resourceUri, signingKey, policyName, expiresInMins) {
     const expiresInSeconds = Math.ceil(Date.now() / 1000 + expiresInMins * 60);
     const toSign = resourceUri + "\n" + expiresInSeconds;
 
-    const hmac = crypto.createHmac("sha256", Buffer.from(signingKey, "base64"));
+    const hmac = Crypto.createHmac("sha256", Buffer.from(signingKey, "base64"));
     hmac.update(toSign);
     const base64UriEncoded = encodeURIComponent(hmac.digest("base64"));
 
@@ -59,13 +58,12 @@ async function convertIotHubToEventHubsConnectionString(connectionString) {
         password: token
     };
 
-    const connection = Connection(connectionOptions);
+    const connection = new Connection(connectionOptions);
     await connection.open();
 
     const receiver = await connection.createReceiver({
         source: {address: `amqps://${HostName}/messages/events/$management`}
     });
-
 
     return new Promise((resolve, reject) => {
         receiver.on(ReceiverEvents.receiverError, (context) => {

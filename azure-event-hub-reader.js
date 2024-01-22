@@ -1,4 +1,4 @@
-const {EventHubProducerClient, EventHubConsumerClient} = require('@azure/event-hubs');
+const {EventHubConsumerClient} = require('@azure/event-hubs');
 const {convertIotHubToEventHubsConnectionString} = require('./azure-iot-hub-connector.js');
 
 
@@ -10,7 +10,6 @@ class AzureEventHubReader {
 
     async startReadMessage(startReadMessageCallBack) {
         try {
-
             const eventHubConnectionString = await convertIotHubToEventHubsConnectionString(this.iotHubConnectionString);
             const consumerClient = new EventHubConsumerClient(this.azureConsumerGroup, eventHubConnectionString);
             console.log('Successfully created the EventHubConsumerClient from IoT Hub event hub-compatible connection string.');
@@ -20,7 +19,7 @@ class AzureEventHubReader {
             consumerClient.subscribe({
                 processEvents: (events, context) => {
                     for (let i = 0; i < events.length; ++i) {
-                        startReadMessageCallback(
+                        startReadMessageCallBack(
                             events[i].body,
                             events[i].enqueuedTimeUtc,
                             events[i].systemProperties["iothub-connection-device-id"]);
@@ -46,4 +45,4 @@ class AzureEventHubReader {
     }
 }
 
-module.exports = EventHubReader;
+module.exports = AzureEventHubReader;
