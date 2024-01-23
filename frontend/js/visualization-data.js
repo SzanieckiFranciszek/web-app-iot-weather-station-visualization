@@ -94,7 +94,22 @@ $(document).ready(() => {
                     beginAtZero: true,
                     fontColor: 'black'
                 }
-            }]
+            },
+                {
+                    id: 'Humidity',
+                    type: 'linear',
+                    scaleLabel: {
+                        display: true,
+                        fontColor: 'black'
+                    },
+                    position: 'right',
+                    ticks: {
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        beginAtZero: true,
+                        fontColor: 'black'
+                    }
+                }]
         }
     };
 
